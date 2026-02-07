@@ -1,1 +1,1236 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>متابعة حفظ القرآن الكريم</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
+        :root {
+            --primary-color: #2c786c;
+            --secondary-color: #ff9a3c;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a5f7a 0%, #159895 100%);
+            color: var(--dark-color);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 30px 0;
+            color: white;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #235347;
+            transform: scale(1.05);
+        }
+
+        .btn-secondary {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #e6892e;
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            background: #f1f3f5;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 15px;
+            background: none;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .surah-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .surah-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .surah-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .surah-card.memorized {
+            border-color: var(--success-color);
+            background: rgba(40, 167, 69, 0.1);
+        }
+
+        .surah-card.in-progress {
+            border-color: var(--warning-color);
+            background: rgba(255, 193, 7, 0.1);
+        }
+
+        .surah-number {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            background: var(--primary-color);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .surah-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: var(--primary-color);
+        }
+
+        .surah-verse-count {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .status-badge {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .badge-memorized {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .badge-in-progress {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .progress-section {
+            margin-top: 30px;
+        }
+
+        .progress-bar {
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            color: #666;
+        }
+
+        .test-question {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+
+        .options-container {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .option-btn {
+            padding: 20px;
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            text-align: right;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+        }
+
+        .option-btn:hover {
+            background: #e9ecef;
+        }
+
+        .option-btn.correct {
+            background: rgba(40, 167, 69, 0.2);
+            border-color: var(--success-color);
+        }
+
+        .option-btn.incorrect {
+            background: rgba(220, 53, 69, 0.2);
+            border-color: var(--danger-color);
+        }
+
+        .congratulations {
+            text-align: center;
+            padding: 40px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .congratulations h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .congratulations p {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .avatar {
+            width: 80px;
+            height: 80px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            font-weight: bold;
+        }
+
+        .user-info h3 {
+            font-size: 1.8rem;
+            color: var(--dark-color);
+            margin-bottom: 5px;
+        }
+
+        .user-info p {
+            color: #666;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transform: translateX(400px);
+            transition: transform 0.5s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--success-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        @media (max-width: 768px) {
+            .surah-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+
+        .login-container {
+            max-width: 400px;
+            margin: 50px auto;
+        }
+
+        .login-form {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .login-form h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--primary-color);
+        }
+
+        .logo {
+            text-align: center;
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px 0;
+            color: white;
+            margin-top: 50px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <!-- شاشة الدخول -->
+    <div id="loginScreen" class="container login-container">
+        <div class="login-form">
+            <div class="logo">📖</div>
+            <h2>مرحباً بك في برنامج متابعة حفظ القرآن</h2>
+            
+            <div class="form-group">
+                <input type="text" id="username" class="form-control" placeholder="اسم المستخدم" required>
+            </div>
+            
+            <div class="form-group">
+                <input type="password" id="password" class="form-control" placeholder="كلمة المرور" required>
+            </div>
+            
+            <div class="form-group">
+                <input type="email" id="email" class="form-control" placeholder="البريد الإلكتروني">
+            </div>
+            
+            <div class="form-group">
+                <button id="loginBtn" class="btn btn-primary" style="width: 100%;">
+                    تسجيل الدخول / إنشاء حساب
+                </button>
+            </div>
+            
+            <p style="text-align: center; color: #666; margin-top: 20px;">
+                سيتم حفظ بياناتك محلياً على جهازك
+            </p>
+        </div>
+    </div>
+
+    <!-- التطبيق الرئيسي -->
+    <div id="appScreen" class="container hidden">
+        <!-- الرأس -->
+        <div class="header">
+            <h1>متابعة حفظ القرآن الكريم</h1>
+            <p>حَفِظْنَاهُ وَأَنْزَلْنَاهُ وَنَحْنُ لَهُ لَحَافِظُونَ</p>
+        </div>
+
+        <!-- التنبيهات -->
+        <div id="notification" class="notification">
+            <div class="notification-icon">✓</div>
+            <div>
+                <h4 style="margin-bottom: 5px;">مبروك!</h4>
+                <p>تم تحديث حالة الحفظ بنجاح</p>
+            </div>
+        </div>
+
+        <!-- الملف الشخصي -->
+        <div class="user-profile">
+            <div class="avatar" id="userAvatar">م</div>
+            <div class="user-info">
+                <h3 id="userName">مستخدم</h3>
+                <p id="userEmail">user@example.com</p>
+                <button id="logoutBtn" class="btn btn-danger" style="margin-top: 10px;">
+                    تسجيل الخروج
+                </button>
+            </div>
+        </div>
+
+        <!-- التبويبات -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="surahs">السور</button>
+            <button class="tab-btn" data-tab="progress">التقدم</button>
+            <button class="tab-btn" data-tab="test">الاختبار</button>
+            <button class="tab-btn" data-tab="stats">الإحصائيات</button>
+        </div>
+
+        <!-- محتوى التبويبات -->
+        <div class="tab-content active" id="surahsTab">
+            <div class="card">
+                <h2 style="margin-bottom: 20px; color: var(--primary-color);">سور القرآن الكريم</h2>
+                <div style="margin-bottom: 20px;">
+                    <button id="markAllMemorized" class="btn btn-success">تحديد الكل كمحفوظ</button>
+                    <button id="clearAll" class="btn btn-danger" style="margin-right: 10px;">مسح الكل</button>
+                </div>
+                <div class="surah-grid" id="surahGrid">
+                    <!-- سيتم ملؤه بالكود -->
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="progressTab">
+            <div class="card">
+                <h2 style="margin-bottom: 20px; color: var(--primary-color);">تقدم الحفظ</h2>
+                
+                <div class="progress-section">
+                    <h3 style="margin-bottom: 15px;">النسبة المئوية الإجمالية</h3>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="totalProgress" style="width: 0%"></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 30px;">
+                        <span>محفوظ</span>
+                        <span id="progressPercent">0%</span>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="memorizedCount">0</div>
+                        <div class="stat-label">سورة محفوظة</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="inProgressCount">0</div>
+                        <div class="stat-label">قيد الحفظ</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="remainingCount">114</div>
+                        <div class="stat-label">سورة متبقية</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="testTab">
+            <div class="card">
+                <h2 style="margin-bottom: 20px; color: var(--primary-color);">اختبار الحفظ</h2>
+                
+                <div id="testIntro">
+                    <p style="margin-bottom: 20px;">اختر مستوى صعوبة الاختبار:</p>
+                    <div style="display: flex; gap: 15px; margin-bottom: 30px;">
+                        <button class="btn btn-primary" data-level="easy">سهل</button>
+                        <button class="btn btn-secondary" data-level="medium">متوسط</button>
+                        <button class="btn btn-danger" data-level="hard">صعب</button>
+                    </div>
+                    <p style="color: #666;">
+                        سيتم سؤالك عن آيات من السور التي حددتها كمحفوظة
+                    </p>
+                </div>
+
+                <div id="testContent" class="hidden">
+                    <div class="test-question" id="questionText"></div>
+                    
+                    <div class="options-container" id="optionsContainer"></div>
+                    
+                    <div id="testResult" class="hidden">
+                        <h3 style="color: var(--primary-color); margin-bottom: 15px;">نتيجة السؤال</h3>
+                        <p id="resultText"></p>
+                        <button id="nextQuestion" class="btn btn-primary" style="margin-top: 20px;">
+                            السؤال التالي
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="statsTab">
+            <div class="card">
+                <h2 style="margin-bottom: 20px; color: var(--primary-color);">الإحصائيات</h2>
+                
+                <div id="congratulationsSection" class="congratulations hidden">
+                    <h2>🎉 مبروك! 🎉</h2>
+                    <p>لقد أتممت حفظ <span id="congratsCount">0</span> سورة</p>
+                    <p>حفظك للقرآن نور على نور</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalDays">0</div>
+                        <div class="stat-label">أيام من الحفظ</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="lastActive">0</div>
+                        <div class="stat-label">يوم منذ آخر نشاط</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="testScore">0</div>
+                        <div class="stat-label">نتيجة الاختبارات</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="goalCompletion">0%</div>
+                        <div class="stat-label">إنجاز الهدف</div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <h3 style="margin-bottom: 15px;">أهداف الحفظ</h3>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="goalProgress" style="width: 0%"></div>
+                    </div>
+                    <div style="text-align: center; margin-top: 10px;">
+                        <input type="range" id="goalSlider" min="1" max="114" value="30" style="width: 100%;">
+                        <p>الهدف: حفظ <span id="goalValue">30</span> سورة</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- الفوتر -->
+        <div class="footer">
+            <p>© 2024 برنامج متابعة حفظ القرآن الكريم | "وَلَقَدْ يَسَّرْنَا الْقُرْآنَ لِلذِّكْرِ فَهَلْ مِن مُّدَّكِرٍ"</p>
+        </div>
+    </div>
+
+    <script>
+        // بيانات السور القرآنية
+        const surahs = [
+            { number: 1, name: "الفاتحة", verses: 7, type: "مكية" },
+            { number: 2, name: "البقرة", verses: 286, type: "مدنية" },
+            { number: 3, name: "آل عمران", verses: 200, type: "مدنية" },
+            { number: 4, name: "النساء", verses: 176, type: "مدنية" },
+            { number: 5, name: "المائدة", verses: 120, type: "مدنية" },
+            { number: 6, name: "الأنعام", verses: 165, type: "مكية" },
+            { number: 7, name: "الأعراف", verses: 206, type: "مكية" },
+            { number: 8, name: "الأنفال", verses: 75, type: "مدنية" },
+            { number: 9, name: "التوبة", verses: 129, type: "مدنية" },
+            { number: 10, name: "يونس", verses: 109, type: "مكية" },
+            { number: 11, name: "هود", verses: 123, type: "مكية" },
+            { number: 12, name: "يوسف", verses: 111, type: "مكية" },
+            { number: 13, name: "الرعد", verses: 43, type: "مدنية" },
+            { number: 14, name: "إبراهيم", verses: 52, type: "مكية" },
+            { number: 15, name: "الحجر", verses: 99, type: "مكية" },
+            { number: 16, name: "النحل", verses: 128, type: "مكية" },
+            { number: 17, name: "الإسراء", verses: 111, type: "مكية" },
+            { number: 18, name: "الكهف", verses: 110, type: "مكية" },
+            { number: 19, name: "مريم", verses: 98, type: "مكية" },
+            { number: 20, name: "طه", verses: 135, type: "مكية" },
+            { number: 21, name: "الأنبياء", verses: 112, type: "مكية" },
+            { number: 22, name: "الحج", verses: 78, type: "مدنية" },
+            { number: 23, name: "المؤمنون", verses: 118, type: "مكية" },
+            { number: 24, name: "النور", verses: 64, type: "مدنية" },
+            { number: 25, name: "الفرقان", verses: 77, type: "مكية" },
+            { number: 26, name: "الشعراء", verses: 227, type: "مكية" },
+            { number: 27, name: "النمل", verses: 93, type: "مكية" },
+            { number: 28, name: "القصص", verses: 88, type: "مكية" },
+            { number: 29, name: "العنكبوت", verses: 69, type: "مكية" },
+            { number: 30, name: "الروم", verses: 60, type: "مكية" },
+            { number: 31, name: "لقمان", verses: 34, type: "مكية" },
+            { number: 32, name: "السجدة", verses: 30, type: "مكية" },
+            { number: 33, name: "الأحزاب", verses: 73, type: "مدنية" },
+            { number: 34, name: "سبأ", verses: 54, type: "مكية" },
+            { number: 35, name: "فاطر", verses: 45, type: "مكية" },
+            { number: 36, name: "يس", verses: 83, type: "مكية" },
+            { number: 37, name: "الصافات", verses: 182, type: "مكية" },
+            { number: 38, name: "ص", verses: 88, type: "مكية" },
+            { number: 39, name: "الزمر", verses: 75, type: "مكية" },
+            { number: 40, name: "غافر", verses: 85, type: "مكية" },
+            { number: 41, name: "فصلت", verses: 54, type: "مكية" },
+            { number: 42, name: "الشورى", verses: 53, type: "مكية" },
+            { number: 43, name: "الزخرف", verses: 89, type: "مكية" },
+            { number: 44, name: "الدخان", verses: 59, type: "مكية" },
+            { number: 45, name: "الجاثية", verses: 37, type: "مكية" },
+            { number: 46, name: "الأحقاف", verses: 35, type: "مكية" },
+            { number: 47, name: "محمد", verses: 38, type: "مدنية" },
+            { number: 48, name: "الفتح", verses: 29, type: "مدنية" },
+            { number: 49, name: "الحجرات", verses: 18, type: "مدنية" },
+            { number: 50, name: "ق", verses: 45, type: "مكية" },
+            { number: 51, name: "الذاريات", verses: 60, type: "مكية" },
+            { number: 52, name: "الطور", verses: 49, type: "مكية" },
+            { number: 53, name: "النجم", verses: 62, type: "مكية" },
+            { number: 54, name: "القمر", verses: 55, type: "مكية" },
+            { number: 55, name: "الرحمن", verses: 78, type: "مدنية" },
+            { number: 56, name: "الواقعة", verses: 96, type: "مكية" },
+            { number: 57, name: "الحديد", verses: 29, type: "مدنية" },
+            { number: 58, name: "المجادلة", verses: 22, type: "مدنية" },
+            { number: 59, name: "الحشر", verses: 24, type: "مدنية" },
+            { number: 60, name: "الممتحنة", verses: 13, type: "مدنية" },
+            { number: 61, name: "الصف", verses: 14, type: "مدنية" },
+            { number: 62, name: "الجمعة", verses: 11, type: "مدنية" },
+            { number: 63, name: "المنافقون", verses: 11, type: "مدنية" },
+            { number: 64, name: "التغابن", verses: 18, type: "مدنية" },
+            { number: 65, name: "الطلاق", verses: 12, type: "مدنية" },
+            { number: 66, name: "التحريم", verses: 12, type: "مدنية" },
+            { number: 67, name: "الملك", verses: 30, type: "مكية" },
+            { number: 68, name: "القلم", verses: 52, type: "مكية" },
+            { number: 69, name: "الحاقة", verses: 52, type: "مكية" },
+            { number: 70, name: "المعارج", verses: 44, type: "مكية" },
+            { number: 71, name: "نوح", verses: 28, type: "مكية" },
+            { number: 72, name: "الجن", verses: 28, type: "مكية" },
+            { number: 73, name: "المزمل", verses: 20, type: "مكية" },
+            { number: 74, name: "المدثر", verses: 56, type: "مكية" },
+            { number: 75, name: "القيامة", verses: 40, type: "مكية" },
+            { number: 76, name: "الإنسان", verses: 31, type: "مدنية" },
+            { number: 77, name: "المرسلات", verses: 50, type: "مكية" },
+            { number: 78, name: "النبأ", verses: 40, type: "مكية" },
+            { number: 79, name: "النازعات", verses: 46, type: "مكية" },
+            { number: 80, name: "عبس", verses: 42, type: "مكية" },
+            { number: 81, name: "التكوير", verses: 29, type: "مكية" },
+            { number: 82, name: "الانفطار", verses: 19, type: "مكية" },
+            { number: 83, name: "المطففين", verses: 36, type: "مكية" },
+            { number: 84, name: "الانشقاق", verses: 25, type: "مكية" },
+            { number: 85, name: "البروج", verses: 22, type: "مكية" },
+            { number: 86, name: "الطارق", verses: 17, type: "مكية" },
+            { number: 87, name: "الأعلى", verses: 19, type: "مكية" },
+            { number: 88, name: "الغاشية", verses: 26, type: "مكية" },
+            { number: 89, name: "الفجر", verses: 30, type: "مكية" },
+            { number: 90, name: "البلد", verses: 20, type: "مكية" },
+            { number: 91, name: "الشمس", verses: 15, type: "مكية" },
+            { number: 92, name: "الليل", verses: 21, type: "مكية" },
+            { number: 93, name: "الضحى", verses: 11, type: "مكية" },
+            { number: 94, name: "الشرح", verses: 8, type: "مكية" },
+            { number: 95, name: "التين", verses: 8, type: "مكية" },
+            { number: 96, name: "العلق", verses: 19, type: "مكية" },
+            { number: 97, name: "القدر", verses: 5, type: "مكية" },
+            { number: 98, name: "البينة", verses: 8, type: "مدنية" },
+            { number: 99, name: "الزلزلة", verses: 8, type: "مدنية" },
+            { number: 100, name: "العاديات", verses: 11, type: "مكية" },
+            { number: 101, name: "القارعة", verses: 11, type: "مكية" },
+            { number: 102, name: "التكاثر", verses: 8, type: "مكية" },
+            { number: 103, name: "العصر", verses: 3, type: "مكية" },
+            { number: 104, name: "الهمزة", verses: 9, type: "مكية" },
+            { number: 105, name: "الفيل", verses: 5, type: "مكية" },
+            { number: 106, name: "قريش", verses: 4, type: "مكية" },
+            { number: 107, name: "الماعون", verses: 7, type: "مكية" },
+            { number: 108, name: "الكوثر", verses: 3, type: "مكية" },
+            { number: 109, name: "الكافرون", verses: 6, type: "مكية" },
+            { number: 110, name: "النصر", verses: 3, type: "مدنية" },
+            { number: 111, name: "المسد", verses: 5, type: "مكية" },
+            { number: 112, name: "الإخلاص", verses: 4, type: "مكية" },
+            { number: 113, name: "الفلق", verses: 5, type: "مكية" },
+            { number: 114, name: "الناس", verses: 6, type: "مكية" }
+        ];
+
+        // بيانات الاختبارات
+        const testQuestions = [
+            {
+                question: "ما هي أول آية نزلت من القرآن الكريم؟",
+                options: ["اقرأ باسم ربك الذي خلق", "بسم الله الرحمن الرحيم", "الحمد لله رب العالمين", "قل هو الله أحد"],
+                correct: 0
+            },
+            {
+                question: "كم عدد آيات سورة الفاتحة؟",
+                options: ["5 آيات", "6 آيات", "7 آيات", "8 آيات"],
+                correct: 2
+            },
+            {
+                question: "ما هي أطول سورة في القرآن الكريم؟",
+                options: ["سورة البقرة", "سورة آل عمران", "سورة النساء", "سورة المائدة"],
+                correct: 0
+            },
+            {
+                question: "ما هي أقصر سورة في القرآن الكريم؟",
+                options: ["سورة الكوثر", "سورة الإخلاص", "سورة الفلق", "سورة الناس"],
+                correct: 0
+            },
+            {
+                question: "كم عدد سجدات التلاوة في القرآن؟",
+                options: ["11 سجدة", "14 سجدة", "15 سجدة", "17 سجدة"],
+                correct: 2
+            },
+            {
+                question: "ما السورة التي تبدأ بـ (الرحمن)؟",
+                options: ["سورة الرحمن", "سورة الفاتحة", "سورة مريم", "سورة آل عمران"],
+                correct: 0
+            },
+            {
+                question: "ما هي السورة التي تسمى قلب القرآن؟",
+                options: ["سورة يس", "سورة الفاتحة", "سورة البقرة", "سورة الإخلاص"],
+                correct: 0
+            },
+            {
+                question: "كم عدد مرات ذكر اسم النبي محمد صلى الله عليه وسلم في القرآن؟",
+                options: ["3 مرات", "4 مرات", "5 مرات", "6 مرات"],
+                correct: 1
+            },
+            {
+                question: "ما هي السورة التي لا تبدأ بالبسملة؟",
+                options: ["سورة التوبة", "سورة الفاتحة", "سورة النمل", "سورة يوسف"],
+                correct: 0
+            },
+            {
+                question: "كم عدد أحزاب القرآن الكريم؟",
+                options: ["30 حزباً", "60 حزباً", "120 حزباً", "240 حزباً"],
+                correct: 1
+            }
+        ];
+
+        // حالة التطبيق
+        let currentUser = null;
+        let userData = {
+            memorizedSurahs: [],
+            inProgressSurahs: [],
+            testHistory: [],
+            goals: {},
+            registrationDate: new Date().toISOString(),
+            lastActive: new Date().toISOString()
+        };
+
+        let currentTest = {
+            level: 'easy',
+            currentQuestion: 0,
+            score: 0,
+            questions: []
+        };
+
+        // تهيئة التطبيق
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUserData();
+            setupEventListeners();
+            renderSurahs();
+            updateStatistics();
+        });
+
+        // تحميل بيانات المستخدم
+        function loadUserData() {
+            const savedUser = localStorage.getItem('quranUser');
+            const savedData = localStorage.getItem('quranUserData');
+            
+            if (savedUser && savedData) {
+                currentUser = JSON.parse(savedUser);
+                userData = JSON.parse(savedData);
+                showAppScreen();
+            }
+        }
+
+        // حفظ بيانات المستخدم
+        function saveUserData() {
+            userData.lastActive = new Date().toISOString();
+            localStorage.setItem('quranUser', JSON.stringify(currentUser));
+            localStorage.setItem('quranUserData', JSON.stringify(userData));
+        }
+
+        // إعداد المستمعين للأحداث
+        function setupEventListeners() {
+            // تسجيل الدخول
+            document.getElementById('loginBtn').addEventListener('click', handleLogin);
+            
+            // التبويبات
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const tabId = this.dataset.tab;
+                    switchTab(tabId);
+                });
+            });
+
+            // السور
+            document.getElementById('markAllMemorized').addEventListener('click', markAllMemorized);
+            document.getElementById('clearAll').addEventListener('click', clearAllSurahs);
+
+            // الاختبار
+            document.querySelectorAll('[data-level]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    startTest(this.dataset.level);
+                });
+            });
+
+            document.getElementById('nextQuestion')?.addEventListener('click', nextQuestion);
+
+            // الأهداف
+            document.getElementById('goalSlider').addEventListener('input', function() {
+                document.getElementById('goalValue').textContent = this.value;
+                updateGoalProgress();
+            });
+
+            // تسجيل الخروج
+            document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+        }
+
+        // معالجة تسجيل الدخول
+        function handleLogin() {
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+            
+            if (!username) {
+                showNotification('يرجى إدخال اسم المستخدم', 'error');
+                return;
+            }
+
+            currentUser = {
+                username: username,
+                email: email || `${username}@quran.com`,
+                avatar: username.charAt(0).toUpperCase()
+            };
+
+            showAppScreen();
+            saveUserData();
+            showNotification('مرحباً بك ' + username, 'success');
+        }
+
+        // تسجيل الخروج
+        function handleLogout() {
+            if (confirm('هل تريد تسجيل الخروج؟')) {
+                currentUser = null;
+                document.getElementById('appScreen').classList.add('hidden');
+                document.getElementById('loginScreen').classList.remove('hidden');
+                
+                // مسح حقول الدخول
+                document.getElementById('username').value = '';
+                document.getElementById('password').value = '';
+                document.getElementById('email').value = '';
+            }
+        }
+
+        // عرض شاشة التطبيق
+        function showAppScreen() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('appScreen').classList.remove('hidden');
+            
+            // تحديث معلومات المستخدم
+            document.getElementById('userName').textContent = currentUser.username;
+            document.getElementById('userEmail').textContent = currentUser.email;
+            document.getElementById('userAvatar').textContent = currentUser.avatar;
+        }
+
+        // تبديل التبويبات
+        function switchTab(tabId) {
+            // إزالة النشاط من جميع الأزرار
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // إخفاء جميع المحتويات
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // تفعيل التبويب المحدد
+            document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+            document.getElementById(`${tabId}Tab`).classList.add('active');
+        }
+
+        // عرض السور
+        function renderSurahs() {
+            const grid = document.getElementById('surahGrid');
+            grid.innerHTML = '';
+
+            surahs.forEach(surah => {
+                const isMemorized = userData.memorizedSurahs.includes(surah.number);
+                const inProgress = userData.inProgressSurahs.includes(surah.number);
+
+                const surahCard = document.createElement('div');
+                surahCard.className = 'surah-card';
+                if (isMemorized) surahCard.classList.add('memorized');
+                if (inProgress) surahCard.classList.add('in-progress');
+
+                surahCard.innerHTML = `
+                    <div class="surah-number">${surah.number}</div>
+                    <div class="surah-name">${surah.name}</div>
+                    <div class="surah-verse-count">${surah.verses} آية</div>
+                    ${isMemorized ? '<div class="status-badge badge-memorized">محفوظ</div>' : 
+                      inProgress ? '<div class="status-badge badge-in-progress">قيد الحفظ</div>' : ''}
+                `;
+
+                surahCard.addEventListener('click', function() {
+                    toggleSurahStatus(surah.number);
+                });
+
+                grid.appendChild(surahCard);
+            });
+        }
+
+        // تبديل حالة السورة
+        function toggleSurahStatus(surahNumber) {
+            if (userData.memorizedSurahs.includes(surahNumber)) {
+                // إزالة من المحفوظ وإضافته للتقدم
+                userData.memorizedSurahs = userData.memorizedSurahs.filter(n => n !== surahNumber);
+                if (!userData.inProgressSurahs.includes(surahNumber)) {
+                    userData.inProgressSurahs.push(surahNumber);
+                }
+            } else if (userData.inProgressSurahs.includes(surahNumber)) {
+                // إزالة من التقدم
+                userData.inProgressSurahs = userData.inProgressSurahs.filter(n => n !== surahNumber);
+            } else {
+                // إضافة للتقدم
+                userData.inProgressSurahs.push(surahNumber);
+            }
+
+            saveUserData();
+            renderSurahs();
+            updateStatistics();
+            showNotification('تم تحديث حالة السورة', 'success');
+        }
+
+        // تحديد كل السور كمحفوظة
+        function markAllMemorized() {
+            if (confirm('هل تريد تحديد جميع السور كمحفوظة؟')) {
+                userData.memorizedSurahs = surahs.map(s => s.number);
+                userData.inProgressSurahs = [];
+                saveUserData();
+                renderSurahs();
+                updateStatistics();
+                showNotification('تم تحديد جميع السور كمحفوظة', 'success');
+            }
+        }
+
+        // مسح جميع الحالات
+        function clearAllSurahs() {
+            if (confirm('هل تريد مسح جميع حالات الحفظ؟')) {
+                userData.memorizedSurahs = [];
+                userData.inProgressSurahs = [];
+                saveUserData();
+                renderSurahs();
+                updateStatistics();
+                showNotification('تم مسح جميع حالات الحفظ', 'success');
+            }
+        }
+
+        // تحديث الإحصائيات
+        function updateStatistics() {
+            const memorizedCount = userData.memorizedSurahs.length;
+            const inProgressCount = userData.inProgressSurahs.length;
+            const remainingCount = 114 - memorizedCount - inProgressCount;
+            const totalProgress = Math.round((memorizedCount / 114) * 100);
+
+            // تحديث الأرقام
+            document.getElementById('memorizedCount').textContent = memorizedCount;
+            document.getElementById('inProgressCount').textContent = inProgressCount;
+            document.getElementById('remainingCount').textContent = remainingCount;
+            document.getElementById('progressPercent').textContent = `${totalProgress}%`;
+            
+            // تحديث شريط التقدم
+            document.getElementById('totalProgress').style.width = `${totalProgress}%`;
+
+            // تحديث الإحصائيات الأخرى
+            const regDate = new Date(userData.registrationDate);
+            const today = new Date();
+            const diffTime = Math.abs(today - regDate);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            document.getElementById('totalDays').textContent = diffDays;
+            document.getElementById('lastActive').textContent = 0;
+
+            // عرض التبريكات إذا كان هناك إنجاز
+            if (memorizedCount >= 10) {
+                document.getElementById('congratulationsSection').classList.remove('hidden');
+                document.getElementById('congratsCount').textContent = memorizedCount;
+            } else {
+                document.getElementById('congratulationsSection').classList.add('hidden');
+            }
+
+            updateGoalProgress();
+        }
+
+        // تحديث تقدم الهدف
+        function updateGoalProgress() {
+            const goal = parseInt(document.getElementById('goalSlider').value);
+            const memorized = userData.memorizedSurahs.length;
+            const progress = Math.min(Math.round((memorized / goal) * 100), 100);
+
+            document.getElementById('goalProgress').style.width = `${progress}%`;
+            document.getElementById('goalCompletion').textContent = `${progress}%`;
+        }
+
+        // بدء الاختبار
+        function startTest(level) {
+            currentTest = {
+                level: level,
+                currentQuestion: 0,
+                score: 0,
+                questions: [...testQuestions].sort(() => Math.random() - 0.5).slice(0, 5)
+            };
+
+            document.getElementById('testIntro').classList.add('hidden');
+            document.getElementById('testContent').classList.remove('hidden');
+            document.getElementById('testResult').classList.add('hidden');
+
+            showQuestion();
+        }
+
+        // عرض السؤال
+        function showQuestion() {
+            if (currentTest.currentQuestion >= currentTest.questions.length) {
+                endTest();
+                return;
+            }
+
+            const question = currentTest.questions[currentTest.currentQuestion];
+            
+            document.getElementById('questionText').textContent = `السؤال ${currentTest.currentQuestion + 1}: ${question.question}`;
+            
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+            optionsContainer.classList.remove('disabled');
+
+            question.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.className = 'option-btn';
+                button.textContent = option;
+                button.dataset.index = index;
+                button.addEventListener('click', function() {
+                    checkAnswer(index);
+                });
+                optionsContainer.appendChild(button);
+            });
+
+            document.getElementById('testResult').classList.add('hidden');
+        }
+
+        // التحقق من الإجابة
+        function checkAnswer(selectedIndex) {
+            const question = currentTest.questions[currentTest.currentQuestion];
+            const options = document.querySelectorAll('.option-btn');
+            const resultDiv = document.getElementById('testResult');
+            const resultText = document.getElementById('resultText');
+
+            options.forEach((btn, index) => {
+                if (index === question.correct) {
+                    btn.classList.add('correct');
+                } else if (index === selectedIndex) {
+                    btn.classList.add('incorrect');
+                }
+                btn.disabled = true;
+            });
+
+            if (selectedIndex === question.correct) {
+                currentTest.score++;
+                resultText.innerHTML = '<span style="color: var(--success-color);">✓ إجابة صحيحة!</span><br>أحسنت!';
+            } else {
+                resultText.innerHTML = `<span style="color: var(--danger-color);">✗ إجابة خاطئة</span><br>الإجابة الصحيحة: ${question.options[question.correct]}`;
+            }
+
+            resultDiv.classList.remove('hidden');
+            document.getElementById('optionsContainer').classList.add('disabled');
+        }
+
+        // السؤال التالي
+        function nextQuestion() {
+            currentTest.currentQuestion++;
+            showQuestion();
+        }
+
+        // إنهاء الاختبار
+        function endTest() {
+            const scorePercentage = Math.round((currentTest.score / currentTest.questions.length) * 100);
+            
+            document.getElementById('testContent').classList.add('hidden');
+            document.getElementById('testIntro').classList.remove('hidden');
+            
+            // حفظ نتيجة الاختبار
+            userData.testHistory.push({
+                date: new Date().toISOString(),
+                level: currentTest.level,
+                score: scorePercentage
+            });
+
+            saveUserData();
+            updateStatistics();
+            
+            showNotification(`أكملت الاختبار بنسبة ${scorePercentage}%`, 'success');
+        }
+
+        // إظهار التنبيه
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const icon = notification.querySelector('.notification-icon');
+            
+            if (type === 'error') {
+                icon.textContent = '✗';
+                icon.style.background = 'var(--danger-color)';
+            } else if (type === 'warning') {
+                icon.textContent = '!';
+                icon.style.background = 'var(--warning-color)';
+            } else {
+                icon.textContent = '✓';
+                icon.style.background = 'var(--success-color)';
+            }
+            
+            notification.querySelector('h4').textContent = type === 'error' ? 'خطأ' : 
+                                                          type === 'warning' ? 'تنبيه' : 'تم بنجاح';
+            notification.querySelector('p').textContent = message;
+            
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // تحويل التاريخ إلى صيغة مقروءة
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('ar-SA');
+        }
+    </script>
+</body>
+  </html>
